@@ -73,7 +73,7 @@ class Beacon implements BeaconInterface
     public function register(): void
     {
         if ($this->isRegistered()) {
-            //return;
+            return;
         }
 
         try {
