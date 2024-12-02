@@ -6,7 +6,6 @@
              title="Fusion Lab Extensions"
              module="FusionLab_Core"
              sortOrder="10000"
-             resource="FusionLab_Core::main_menu"
-             class="fusionlab-icon"/>
+             resource="FusionLab_Core::main_menu"/>
     </menu>
 </config>
