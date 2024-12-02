@@ -6,9 +6,11 @@ use GuzzleHttp\Exception\GuzzleException;
 use Magento\Framework\App\Config\ScopeConfigInterface;
 use FusionLab\Core\Api\BeaconInterface;
 use GuzzleHttp\Client;
-use GuzzleHttp\Exception\RequestException;
+use Magento\Framework\App\ResourceConnection;
+use Magento\Framework\DB\Adapter\AdapterInterface;
 use Magento\Framework\Filesystem\DirectoryList;
 use Magento\Framework\App\Config\Storage\WriterInterface;
+use Magento\Framework\Encryption\Encryptor;
 
 
 /**
@@ -17,35 +19,51 @@ use Magento\Framework\App\Config\Storage\WriterInterface;
  */
 class Beacon implements BeaconInterface
 {
-    private const BEACON_ENDPOINT = 'http://warden.p83.localhost/';
+    private const BEACON_ENDPOINT = 'http://warden.p83.localhost/api/register';
     private const UID_PATH = 'fusionlab_settings/general/application_uid';
 
     /** @var Client */
     private Client $_client;
+
     /** @var ScopeConfigInterface */
     private ScopeConfigInterface $_scopeConfig;
+
     /** @var DirectoryList */
     private DirectoryList $_directoryList;
+
     /** @var WriterInterface */
     private WriterInterface $_configWriter;
+
+    /** @var AdapterInterface */
+    private AdapterInterface $_connection;
+
+    /** @var Encryptor  */
+    private Encryptor $_encryptor;
+
 
     /**
      * @param Client $client
      * @param ScopeConfigInterface $config
      * @param DirectoryList $directoryList
      * @param WriterInterface $configWriter
+     * @param ResourceConnection $connection
+     * @param Encryptor $encryptor
      */
     public function __construct(
         Client               $client,
         ScopeConfigInterface $config,
         DirectoryList        $directoryList,
-        WriterInterface      $configWriter
+        WriterInterface      $configWriter,
+        ResourceConnection   $connection,
+        Encryptor            $encryptor
     )
     {
         $this->_client = $client;
         $this->_scopeConfig = $config;
         $this->_directoryList = $directoryList;
         $this->_configWriter = $configWriter;
+        $this->_connection = $connection->getConnection();
+        $this->_encryptor = $encryptor;
     }
 
 
@@ -60,15 +78,21 @@ class Beacon implements BeaconInterface
 
         try {
             $response = $this->_client->post(self::BEACON_ENDPOINT, [
-                'form_params' => [
+                'headers' => [
+                    'Content-Type' => 'application/json',
+                    'Accept' => 'application/json',
+                ],
+                'body' => json_encode([
                     'platform' => $this->getPlatform(),
                     'url' => $this->getApplicationUrl(),
-                    'filepath' => $this->initVerification(),
-                ],
+                    'verification' => $this->initVerification(),
+                ]),
+                'timeout' => 5.0,
             ]);
+
             $this->processRegistrationResponse($response);
         } catch (GuzzleException $e) {
-
+            var_dump($e->getMessage());
         }
     }
 
@@ -78,7 +102,7 @@ class Beacon implements BeaconInterface
      */
     private function storeUid($uid): void
     {
-        $this->_configWriter->save(self::UID_PATH, $uid);
+        $this->_configWriter->save(self::UID_PATH, $this->_encryptor->encrypt($uid));
     }
 
     /**
@@ -114,16 +138,32 @@ class Beacon implements BeaconInterface
     {
         $verificationFilePath = '';
         try {
+            // Define the base directory (absolute path)
+            $basePath = '/var/www/html/php83/fusionlab/pub/fusionlab';
 
-            $path = $this->_directoryList->getPath('pub') . DIRECTORY_SEPARATOR . 'fusionlab';
-            $verificationFilePath =
-                $path . DIRECTORY_SEPARATOR .
-                $this->generateRandomString(16) . DIRECTORY_SEPARATOR .
-                $this->generateRandomString(16) . '.txt';
-            file_put_contents($verificationFilePath, $this->generateRandomString(512));
+            // Ensure the directory exists
+            if (!is_dir($basePath)) {
+                mkdir($basePath, 0755, true);
+            }
+
+            // Generate the file path
+            $fileName = $this->generateRandomString(16) . '.txt';
+            $absoluteFilePath = $basePath . DIRECTORY_SEPARATOR . $fileName;
+
+            // Write an empty file
+            file_put_contents($absoluteFilePath, '');
+
+            // Prepare the relative path without the leading slash
+            $verificationFilePath = 'fusionlab/' . $fileName;
+
+            // Debug output (optional, for testing)
+            //var_dump($verificationFilePath);
+
         } catch (\Exception $e) {
-
+            // Handle exceptions
+            var_dump('Error: ' . $e->getMessage());
         }
+
         return $verificationFilePath;
     }
 
@@ -165,16 +205,16 @@ class Beacon implements BeaconInterface
      */
     private function getPlatform(): string
     {
-        return 'magento2';
+        return 'Magento2';
     }
 
 
     /**
-     * @return string|null
+     * @return string
      */
-    private function getApplicationUrl(): ?string
+    private function getApplicationUrl(): string
     {
-        return (string)$this->_scopeConfig->getValue('web/secure/base_url') ?? null;
+        return $this->_scopeConfig->getValue('web/secure/base_url') ?? $this->_scopeConfig->getValue('web/unsecure/base_url');
     }
 
     /**
@@ -182,6 +222,11 @@ class Beacon implements BeaconInterface
      */
     private function isRegistered(): bool
     {
-        return !empty($this->_scopeConfig->getValue(self::UID_PATH));
+        $select = $this->_connection->select()
+            ->from($this->_connection->getTableName('core_config_data'), ['value'])
+            ->where('path  = ?  ', self::UID_PATH);
+
+        return !empty($this->_connection->fetchOne($select));
     }
+
 }
