@@ -73,7 +73,7 @@ class Beacon implements BeaconInterface
     public function register(): void
     {
         if ($this->isRegistered()) {
-            return;
+            //return;
         }
 
         try {
@@ -139,7 +139,7 @@ class Beacon implements BeaconInterface
         $verificationFilePath = '';
         try {
             // Define the base directory (absolute path)
-            $basePath = '/var/www/html/php83/fusionlab/pub/fusionlab';
+            $basePath = $this->_directoryList->getPath('pub') . '/fusionlab';
 
             // Ensure the directory exists
             if (!is_dir($basePath)) {
