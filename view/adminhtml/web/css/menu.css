@@ -1,0 +1,36 @@
+.admin__menu #menu-fusionlab-core-main-menu > a:before {
+    content:'';
+    font-style: normal !important;
+    font-weight: normal !important;
+    font-variant: normal !important;
+    text-transform: none !important;
+    speak: none;
+    line-height: 1;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    background-image: url('../fonts/fusion-lab-icon-neg-cropped.svg');
+    background-repeat: no-repeat;
+    background-position: center;
+    width: 70px;
+    height: 35px;
+    margin-bottom: 10px;
+    top:10px;
+    left:0;
+}
+
+
+.fusionlab-tab strong{
+    margin-left: 4.5rem;
+}
+.fusionlab-tab strong::before{
+    content: "";
+    display: inline-block;
+    background-image: url('../fonts/fusion-lab-icon.svg');
+    background-repeat: no-repeat;
+    background-position: center;
+    width: 70px;
+    height: 30px;
+    position: absolute;
+    top:10px;
+    left:0;
+}
