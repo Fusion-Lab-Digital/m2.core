@@ -6,7 +6,7 @@ namespace FusionLab\Core\Api;
  * Interface HttpPostInterface
  * @package FusionLab\Core\Api
  */
-interface BeaconInterface
+interface RegistrationInterface
 {
 
     /**

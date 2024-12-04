@@ -3,17 +3,17 @@
 namespace FusionLab\Core\Console\Command;
 
 use Magento\Framework\App\State;
-use FusionLab\Core\Model\Beacon;
+use FusionLab\Core\Model\Registration;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 
-class BeaconCommand extends Command
+class RegistrationCommand extends Command
 {
     /**
-     * @var Beacon
+     * @var Registration
      */
-    private $_beacon;
+    private $_Registration;
 
     /**
      * @var State
@@ -22,12 +22,12 @@ class BeaconCommand extends Command
 
     /**
      * SaveConfigCommand constructor.
-     * @param Beacon $beacon
+     * @param Registration $Registration
      * @param State $state
      */
-    public function __construct(Beacon $beacon, State $state)
+    public function __construct(Registration $Registration, State $state)
     {
-        $this->_beacon = $beacon;
+        $this->_Registration = $Registration;
         $this->_state = $state;
         parent::__construct();
     }
@@ -47,7 +47,7 @@ class BeaconCommand extends Command
         try {
             // Set area code to adminhtml to allow config writes
             $this->_state->setAreaCode('adminhtml');
-            $this->_beacon->register();
+            $this->_Registration->register();
             return Command::SUCCESS;
         } catch (\Exception $e) {
             return Command::FAILURE;

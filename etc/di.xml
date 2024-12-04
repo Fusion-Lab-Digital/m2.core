@@ -5,7 +5,7 @@
     <type name="Magento\Framework\Console\CommandListInterface">
         <arguments>
             <argument name="commands" xsi:type="array">
-                <item name="fusionlab_register" xsi:type="object">FusionLab\Core\Console\Command\BeaconCommand</item>
+                <item name="fusionlab_register" xsi:type="object">FusionLab\Core\Console\Command\RegistrationCommand</item>
             </argument>
         </arguments>
     </type>

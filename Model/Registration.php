@@ -4,7 +4,7 @@ namespace FusionLab\Core\Model;
 
 use GuzzleHttp\Exception\GuzzleException;
 use Magento\Framework\App\Config\ScopeConfigInterface;
-use FusionLab\Core\Api\BeaconInterface;
+use FusionLab\Core\Api\RegistrationInterface;
 use GuzzleHttp\Client;
 use Magento\Framework\App\ResourceConnection;
 use Magento\Framework\DB\Adapter\AdapterInterface;
@@ -17,9 +17,9 @@ use Magento\Framework\Encryption\Encryptor;
  * Class HttpPost
  * @package FusionLab\Core\Model
  */
-class Beacon implements BeaconInterface
+class Registration implements RegistrationInterface
 {
-    private const BEACON_ENDPOINT = 'http://warden.p83.localhost/api/register';
+    private const Registration_ENDPOINT = 'http://warden.p83.localhost/api/register';
     private const UID_PATH = 'fusionlab_settings/general/application_uid';
 
     /** @var Client */
@@ -77,7 +77,7 @@ class Beacon implements BeaconInterface
         }
 
         try {
-            $response = $this->_client->post(self::BEACON_ENDPOINT, [
+            $response = $this->_client->post(self::Registration_ENDPOINT, [
                 'headers' => [
                     'Content-Type' => 'application/json',
                     'Accept' => 'application/json',
