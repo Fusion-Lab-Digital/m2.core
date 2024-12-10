@@ -98,9 +98,9 @@ interface PlatformMetaDataInterface
      * Get Refreshed Token.
      *
      * @param string $token
-     * @return string
+     * @return string|null
      */
-    public function getRefreshedToken(string $token) : string;
+    public function getRefreshedToken(string $token) : ?string;
 
     /**
      * Set Refreshed Token.

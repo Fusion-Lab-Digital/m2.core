@@ -1,6 +1,6 @@
 <?php
 
-namespace FusionLab\Core\Api\Data;
+namespace FusionLab\Core\Model;
 
 use FusionLab\Core\Api\PlatformMetaDataInterface;
 

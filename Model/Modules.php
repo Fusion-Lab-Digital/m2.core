@@ -1,10 +1,10 @@
 <?php
 
-namespace FusionLab\Core\Api\Data;
+namespace FusionLab\Core\Model;
 
 use FusionLab\Core\Api\ModulesDataInterface;
 
-class ModulesData implements \FusionLab\Core\Api\ModulesDataInterface
+class Modules implements \FusionLab\Core\Api\ModulesDataInterface
 {
     /**
      * @var string

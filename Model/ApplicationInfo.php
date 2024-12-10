@@ -103,19 +103,30 @@ class ApplicationInfo implements ApplicationInfoInterface
 
         $newToken = $this->generateToken();
 
+        $platformMetaData = $this->getPlatformMetaData($newToken);
+
+        //save the new token before reply
+        $this->setToken($newToken);
+
+        return $platformMetaData;
+    }
+
+
+    /**
+     * @param $newToken
+     * @return PlatformMetaDataInterface
+     */
+    public function getPlatformMetaData($newToken = null): PlatformMetaDataInterface
+    {
         /** @var PlatformMetaDataInterface $platformMetaData */
         $platformMetaData = $this->_platformMetaDataFactory->create();
-        $platformMetaData->setPlatform('Magento2');
+        $platformMetaData->setPlatform($this->getPlatform());
         $platformMetaData->setPhpVersion(PHP_VERSION);
         $platformMetaData->setMysqlVersion($this->getMySQLVersion());
         $platformMetaData->setVersion($this->_productMetaDataInterace->getVersion());
         $platformMetaData->setModules($this->getFusionLabModules());
         $platformMetaData->setUrl($this->getApplicationUrl());
         $platformMetaData->setRefreshedToken($newToken);
-
-        //save the new token before reply
-        $this->setToken($newToken);
-
         return $platformMetaData;
     }
 
