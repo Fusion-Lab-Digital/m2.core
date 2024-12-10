@@ -45,11 +45,16 @@ class PlatformMetaData implements PlatformMetaDataInterface
     private $modules = [];
 
     /**
+     * @var string refreshed Token
+     */
+    private $refreshedToken;
+
+    /**
      * Get the PHP version
      *
      * @return string PHP version
      */
-    public function getPHPVersion(): string
+    public function getPhpVersion(): string
     {
         return $this->phpVersion;
     }
@@ -60,7 +65,7 @@ class PlatformMetaData implements PlatformMetaDataInterface
      * @param string $phpVersion The PHP version to set
      * @return string The set PHP version
      */
-    public function setPHPVersion(string $phpVersion): string
+    public function setPhpVersion(string $phpVersion): string
     {
         $this->phpVersion = $phpVersion;
         return $this->phpVersion;
@@ -71,7 +76,7 @@ class PlatformMetaData implements PlatformMetaDataInterface
      *
      * @return string MySQL version
      */
-    public function getMySQLVersion(): string
+    public function getMysqlVersion(): string
     {
         return $this->mysqlVersion;
     }
@@ -82,7 +87,7 @@ class PlatformMetaData implements PlatformMetaDataInterface
      * @param string $mysqlVersion The MySQL version to set
      * @return string The set MySQL version
      */
-    public function setMySQLVersion(string $mysqlVersion): string
+    public function setMysqlVersion(string $mysqlVersion): string
     {
         $this->mysqlVersion = $mysqlVersion;
         return $this->mysqlVersion;
@@ -174,5 +179,28 @@ class PlatformMetaData implements PlatformMetaDataInterface
     {
         $this->modules = $modules;
         return $this->modules;
+    }
+
+    /**
+     * Get Refreshed Token.
+     *
+     * @param string $token
+     * @return string
+     */
+    public function getRefreshedToken(string $token): string
+    {
+       return $this->refreshedToken;
+    }
+
+    /**
+     * Set Refreshed Token.
+     *
+     * @param string $token
+     * @return string
+     */
+    public function setRefreshedToken(string $token): string
+    {
+        $this->refreshedToken = $token;
+        return $this->refreshedToken;
     }
 }

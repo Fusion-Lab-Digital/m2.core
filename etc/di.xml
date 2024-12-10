@@ -5,6 +5,7 @@
     <preference for="FusionLab\Core\Api\PlatformMetaDataInterface" type="FusionLab\Core\Api\Data\PlatformMetaData"/>
     <preference for="FusionLab\Core\Api\ModulesDataInterface" type="FusionLab\Core\Api\Data\ModulesData"/>
     <preference for="FusionLab\Core\Api\ApplicationInfoInterface" type="FusionLab\Core\Model\ApplicationInfo"/>
+    <preference for="Ramsey\Uuid\Rfc4122\FieldsInterface" type="Ramsey\Uuid\Rfc4122\Fields" />
 
     <type name="Magento\Framework\Console\CommandListInterface">
         <arguments>

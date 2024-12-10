@@ -3,15 +3,10 @@
 namespace FusionLab\Core\Model;
 
 use GuzzleHttp\Exception\GuzzleException;
-use Magento\Framework\App\Config\ScopeConfigInterface;
 use FusionLab\Core\Api\RegistrationInterface;
 use GuzzleHttp\Client;
-use Magento\Framework\App\ResourceConnection;
-use Magento\Framework\DB\Adapter\AdapterInterface;
 use Magento\Framework\Filesystem\DirectoryList;
-use Magento\Framework\App\Config\Storage\WriterInterface;
-use Magento\Framework\Encryption\Encryptor;
-
+use FusionLab\Core\Api\ApplicationInfoInterface;
 
 /**
  * Class HttpPost
@@ -20,50 +15,31 @@ use Magento\Framework\Encryption\Encryptor;
 class Registration implements RegistrationInterface
 {
     private const Registration_ENDPOINT = 'http://warden.p83.localhost/api/register';
-    private const UID_PATH = 'fusionlab_settings/general/application_uid';
 
     /** @var Client */
     private Client $_client;
 
-    /** @var ScopeConfigInterface */
-    private ScopeConfigInterface $_scopeConfig;
-
     /** @var DirectoryList */
     private DirectoryList $_directoryList;
 
-    /** @var WriterInterface */
-    private WriterInterface $_configWriter;
-
-    /** @var AdapterInterface */
-    private AdapterInterface $_connection;
-
-    /** @var Encryptor  */
-    private Encryptor $_encryptor;
+    /** @var ApplicationInfoInterface */
+    private ApplicationInfoInterface $_applicationInfo;
 
 
     /**
      * @param Client $client
-     * @param ScopeConfigInterface $config
      * @param DirectoryList $directoryList
-     * @param WriterInterface $configWriter
-     * @param ResourceConnection $connection
-     * @param Encryptor $encryptor
+     * @param ApplicationInfoInterface $applicationInfo
      */
     public function __construct(
-        Client               $client,
-        ScopeConfigInterface $config,
-        DirectoryList        $directoryList,
-        WriterInterface      $configWriter,
-        ResourceConnection   $connection,
-        Encryptor            $encryptor
+        Client                   $client,
+        DirectoryList            $directoryList,
+        ApplicationInfoInterface $applicationInfo
     )
     {
         $this->_client = $client;
-        $this->_scopeConfig = $config;
         $this->_directoryList = $directoryList;
-        $this->_configWriter = $configWriter;
-        $this->_connection = $connection->getConnection();
-        $this->_encryptor = $encryptor;
+        $this->_applicationInfo = $applicationInfo;
     }
 
 
@@ -83,8 +59,8 @@ class Registration implements RegistrationInterface
                     'Accept' => 'application/json',
                 ],
                 'body' => json_encode([
-                    'platform' => $this->getPlatform(),
-                    'url' => $this->getApplicationUrl(),
+                    'platform' => $this->_applicationInfo->getPlatform(),
+                    'url' => $this->_applicationInfo->getApplicationUrl(),
                     'verification' => $this->initVerification(),
                 ]),
                 'timeout' => 5.0,
@@ -97,15 +73,6 @@ class Registration implements RegistrationInterface
     }
 
     /**
-     * @param $uid
-     * @return void
-     */
-    private function storeUid($uid): void
-    {
-        $this->_configWriter->save(self::UID_PATH, $this->_encryptor->encrypt($uid));
-    }
-
-    /**
      * @param $response
      * @return void
      */
@@ -114,7 +81,7 @@ class Registration implements RegistrationInterface
         $uid = $response->getBody()->getContents() ?? null;
 
         if ($this->isValidUid($uid)) {
-            $this->storeUid($uid);
+            $this->_applicationInfo->setToken($uid);
         }
     }
 
@@ -147,7 +114,7 @@ class Registration implements RegistrationInterface
             }
 
             // Generate the file path
-            $fileName = $this->generateRandomString(16) . '.txt';
+            $fileName = $this->_applicationInfo->generateToken() . '.txt';
             $absoluteFilePath = $basePath . DIRECTORY_SEPARATOR . $fileName;
 
             // Write an empty file
@@ -167,66 +134,12 @@ class Registration implements RegistrationInterface
         return $verificationFilePath;
     }
 
-
-    /**
-     * Generate a random string of a given length.
-     * Ensures randomness even if both `random_bytes` and `random_int` fail.
-     *
-     * @param int $length
-     * @return string
-     */
-    private function generateRandomString(int $length): string
-    {
-        try {
-            // Divide by 2 because bin2hex doubles the length
-            return bin2hex(random_bytes($length / 2));
-        } catch (\Exception $exception) {
-            // Fallback to alternative random generator
-            $characters = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
-            $charactersLength = strlen($characters);
-            $randomString = '';
-            try {
-                for ($i = 0; $i < $length; $i++) {
-                    $randomString .= $characters[random_int(0, $charactersLength - 1)];
-                }
-            } catch (\Exception $e) {
-                // Fallback random generator
-                for ($i = 0; $i < $length; $i++) {
-                    $randomString .= $characters[mt_rand(0, $charactersLength - 1)];
-                }
-            }
-            return $randomString;
-        }
-    }
-
-
-    /**
-     * @return string
-     */
-    private function getPlatform(): string
-    {
-        return 'Magento2';
-    }
-
-
-    /**
-     * @return string
-     */
-    private function getApplicationUrl(): string
-    {
-        return $this->_scopeConfig->getValue('web/secure/base_url') ?? $this->_scopeConfig->getValue('web/unsecure/base_url');
-    }
-
     /**
      * @return bool
      */
     private function isRegistered(): bool
     {
-        $select = $this->_connection->select()
-            ->from($this->_connection->getTableName('core_config_data'), ['value'])
-            ->where('path  = ?  ', self::UID_PATH);
-
-        return !empty($this->_connection->fetchOne($select));
+        return !empty($this->_applicationInfo->getCurrentAuthToken());
     }
 
 }

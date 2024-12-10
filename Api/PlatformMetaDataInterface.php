@@ -93,4 +93,21 @@ interface PlatformMetaDataInterface
      * @return \FusionLab\Core\Api\ModulesDataInterface[]
      */
     public function setModules(array $modules): array;
+
+    /**
+     * Get Refreshed Token.
+     *
+     * @param string $token
+     * @return string
+     */
+    public function getRefreshedToken(string $token) : string;
+
+    /**
+     * Set Refreshed Token.
+     *
+     * @param string $token
+     * @return string
+     */
+    public function setRefreshedToken(string $token) : string;
+
 }
