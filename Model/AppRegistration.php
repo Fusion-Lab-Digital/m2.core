@@ -7,41 +7,38 @@ use FusionLab\Core\Api\RegistrationInterface;
 use GuzzleHttp\Client;
 use Magento\Framework\Filesystem\DirectoryList;
 use FusionLab\Core\Api\ApplicationInfoInterface;
+use Psr\Http\Message\ResponseInterface;
+use Psr\Log\LoggerInterface;
 
-/**
- * Class HttpPost
- * @package FusionLab\Core\Model
- */
-class Registration implements RegistrationInterface
+class AppRegistration implements RegistrationInterface
 {
-    private const Registration_ENDPOINT = 'http://warden.p83.localhost/api/register';
+//    const REGISTRATION_ENDPOINT = 'https://warden.fusionlab.gr/api/register';
+    const REGISTRATION_ENDPOINT = 'http://warden.p83.localhost/api/register';
 
-    /** @var Client */
     private Client $_client;
-
-    /** @var DirectoryList */
     private DirectoryList $_directoryList;
-
-    /** @var ApplicationInfoInterface */
     private ApplicationInfoInterface $_applicationInfo;
 
+    private LoggerInterface $logger;
 
     /**
      * @param Client $client
      * @param DirectoryList $directoryList
      * @param ApplicationInfoInterface $applicationInfo
+     * @param LoggerInterface $logger
      */
     public function __construct(
         Client                   $client,
         DirectoryList            $directoryList,
-        ApplicationInfoInterface $applicationInfo
+        ApplicationInfoInterface $applicationInfo,
+        LoggerInterface           $logger
     )
     {
         $this->_client = $client;
         $this->_directoryList = $directoryList;
         $this->_applicationInfo = $applicationInfo;
+        $this->logger = $logger;
     }
-
 
     /**
      * @return void
@@ -53,32 +50,33 @@ class Registration implements RegistrationInterface
         }
 
         try {
-            $response = $this->_client->post(self::Registration_ENDPOINT, [
+            $response = $this->_client->post(self::REGISTRATION_ENDPOINT, [
                 'headers' => [
                     'Content-Type' => 'application/json',
                     'Accept' => 'application/json',
                 ],
                 'body' => json_encode([
-                    'platform' => $this->_applicationInfo->getPlatform(),
+                    'platform' => ApplicationInfoInterface::PLATFORM,
                     'url' => $this->_applicationInfo->getApplicationUrl(),
-                    'verification' => $this->initVerification(),
+                    'verification' => $this->makeSignature(),
                 ]),
                 'timeout' => 5.0,
+                'connect_timeout' => 5.0,
             ]);
 
             $this->processRegistrationResponse($response);
         } catch (GuzzleException $e) {
-            var_dump($e->getMessage());
+            $this->logger->error($e->getMessage(), $e->getTrace());
         }
     }
 
     /**
-     * @param $response
+     * @param ResponseInterface $response
      * @return void
      */
-    private function processRegistrationResponse($response): void
+    private function processRegistrationResponse(ResponseInterface $response): void
     {
-        $uid = $response->getBody()->getContents() ?? null;
+        $uid = $response->getBody()->getContents();
 
         if ($this->isValidUid($uid)) {
             $this->_applicationInfo->setToken($uid);
@@ -86,51 +84,33 @@ class Registration implements RegistrationInterface
     }
 
     /**
-     * @param $uid
+     * @param string|null $uid
      * @return bool
      */
-    private function isValidUid($uid): bool
+    private function isValidUid(?string $uid): bool
     {
-        if (isset($uid) && strlen($uid) === 36) {
-            return true;
-        }
-        return false;
+        return is_string($uid) && strlen($uid) === 36;
     }
 
 
     /**
      * @return string
      */
-    public function initVerification(): string
+    public function makeSignature(): string
     {
         $verificationFilePath = '';
         try {
-            // Define the base directory (absolute path)
             $basePath = $this->_directoryList->getPath('pub') . '/fusionlab';
-
-            // Ensure the directory exists
             if (!is_dir($basePath)) {
                 mkdir($basePath, 0755, true);
             }
-
-            // Generate the file path
-            $fileName = $this->_applicationInfo->generateToken() . '.txt';
+            $fileName = uniqid() . '.txt';
             $absoluteFilePath = $basePath . DIRECTORY_SEPARATOR . $fileName;
-
-            // Write an empty file
             file_put_contents($absoluteFilePath, '');
-
-            // Prepare the relative path without the leading slash
             $verificationFilePath = 'fusionlab/' . $fileName;
-
-            // Debug output (optional, for testing)
-            //var_dump($verificationFilePath);
-
         } catch (\Exception $e) {
-            // Handle exceptions
-            var_dump('Error: ' . $e->getMessage());
+            $this->logger->error($e->getMessage(), $e->getTrace());
         }
-
         return $verificationFilePath;
     }
 

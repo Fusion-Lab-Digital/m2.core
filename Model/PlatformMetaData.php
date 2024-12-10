@@ -2,205 +2,121 @@
 
 namespace FusionLab\Core\Model;
 
-use FusionLab\Core\Api\PlatformMetaDataInterface;
+use FusionLab\Core\Api\Data\PlatformMetaDataInterface;
+use Magento\Framework\DataObject;
 
-/**
- * Class PlatformMetaData
- *
- * This class implements the PlatformMetaDataInterface and is used to represent
- * platform metadata, including PHP and MySQL versions, platform details, and related modules.
- *
- * @package FusionLab\Core\Api\Data
- */
-class PlatformMetaData implements PlatformMetaDataInterface
+class PlatformMetaData extends DataObject implements PlatformMetaDataInterface
 {
-    /**
-     * @var string PHP version
-     */
-    private $phpVersion;
 
     /**
-     * @var string MySQL version
-     */
-    private $mysqlVersion;
-
-    /**
-     * @var string Platform name
-     */
-    private $platform;
-
-    /**
-     * @var string Platform version
-     */
-    private $version;
-
-    /**
-     * @var string URL of the platform
-     */
-    private $url;
-
-    /**
-     * @var array List of modules
-     */
-    private $modules = [];
-
-    /**
-     * @var string refreshed Token
-     */
-    private $refreshedToken;
-
-    /**
-     * Get the PHP version
-     *
-     * @return string PHP version
+     * @inheritDoc
      */
     public function getPhpVersion(): string
     {
-        return $this->phpVersion;
+        return $this->getData(self::PHP_VERSION);
     }
 
     /**
-     * Set the PHP version
-     *
-     * @param string $phpVersion The PHP version to set
-     * @return string The set PHP version
+     * @inheritDoc
      */
-    public function setPhpVersion(string $phpVersion): string
+    public function setPhpVersion(string $phpVersion): \FusionLab\Core\Api\Data\PlatformMetaDataInterface
     {
-        $this->phpVersion = $phpVersion;
-        return $this->phpVersion;
+        return $this->setData(self::PHP_VERSION, $phpVersion);
     }
 
     /**
-     * Get the MySQL version
-     *
-     * @return string MySQL version
+     * @inheritDoc
      */
     public function getMysqlVersion(): string
     {
-        return $this->mysqlVersion;
+        return $this->getData(self::MYSQL_VERSION);
     }
 
     /**
-     * Set the MySQL version
-     *
-     * @param string $mysqlVersion The MySQL version to set
-     * @return string The set MySQL version
+     * @inheritDoc
      */
-    public function setMysqlVersion(string $mysqlVersion): string
+    public function setMysqlVersion(string $mysqlVersion): \FusionLab\Core\Api\Data\PlatformMetaDataInterface
     {
-        $this->mysqlVersion = $mysqlVersion;
-        return $this->mysqlVersion;
+        return $this->setData(self::MYSQL_VERSION, $mysqlVersion);
     }
 
     /**
-     * Get the platform name
-     *
-     * @return string Platform name
+     * @inheritDoc
      */
     public function getPlatform(): string
     {
-        return $this->platform;
+        return $this->getData(self::PLATFORM);
     }
 
     /**
-     * Set the platform name
-     *
-     * @param string $platform The platform name to set
-     * @return string The set platform name
+     * @inheritDoc
      */
-    public function setPlatform(string $platform): string
+    public function setPlatform(string $platform): \FusionLab\Core\Api\Data\PlatformMetaDataInterface
     {
-        $this->platform = $platform;
-        return $this->platform;
+        return $this->setData(self::PLATFORM, $platform);
     }
 
     /**
-     * Get the platform version
-     *
-     * @return string Platform version
+     * @inheritDoc
      */
     public function getVersion(): string
     {
-        return $this->version;
+        return $this->getData(self::VERSION);
     }
 
     /**
-     * Set the platform version
-     *
-     * @param string $version The platform version to set
-     * @return string The set platform version
+     * @inheritDoc
      */
-    public function setVersion(string $version): string
+    public function setVersion(string $version): \FusionLab\Core\Api\Data\PlatformMetaDataInterface
     {
-        $this->version = $version;
-        return $this->version;
+        return $this->setData(self::VERSION, $version);
     }
 
     /**
-     * Get the URL associated with the platform
-     *
-     * @return string The platform's URL
+     * @inheritDoc
      */
     public function getUrl(): string
     {
-        return $this->url;
+        return $this->getData(self::URL);
     }
 
     /**
-     * Set the URL associated with the platform
-     *
-     * @param string $url The URL to set
-     * @return string The set URL
+     * @inheritDoc
      */
-    public function setUrl(string $url): string
+    public function setUrl(string $url): \FusionLab\Core\Api\Data\PlatformMetaDataInterface
     {
-        $this->url = $url;
-        return $this->url;
+        return $this->setData(self::URL, $url);
     }
 
     /**
-     * Get the list of modules
-     *
-     * @return array The list of modules
+     * @inheritDoc
      */
     public function getModules(): array
     {
-        return $this->modules;
+        return $this->getData(self::MODULES);
     }
 
     /**
-     * Set the list of modules
-     *
-     * @param array $modules The modules to set
-     * @return array The set modules
+     * @inheritDoc
      */
-    public function setModules(array $modules): array
+    public function setModules(array $modules): \FusionLab\Core\Api\Data\PlatformMetaDataInterface
     {
-        $this->modules = $modules;
-        return $this->modules;
+        return $this->setData(self::MODULES, $modules);
     }
 
     /**
-     * Get Refreshed Token.
-     *
-     * @param string $token
-     * @return string
+     * @inheritDoc
      */
-    public function getRefreshedToken(string $token): string
+    public function getRefreshedToken(): ?string
     {
-       return $this->refreshedToken;
+        return $this->getData(self::REFRESHED_TOKEN);
     }
 
     /**
-     * Set Refreshed Token.
-     *
-     * @param string $token
-     * @return string
+     * @inheritDoc
      */
-    public function setRefreshedToken(string $token): string
+    public function setRefreshedToken(string $token): \FusionLab\Core\Api\Data\PlatformMetaDataInterface
     {
-        $this->refreshedToken = $token;
-        return $this->refreshedToken;
+        return $this->setData(self::REFRESHED_TOKEN, $token);
     }
 }

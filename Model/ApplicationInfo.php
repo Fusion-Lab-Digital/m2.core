@@ -3,73 +3,68 @@
 namespace FusionLab\Core\Model;
 
 use FusionLab\Core\Api\ApplicationInfoInterface;
-use FusionLab\Core\Api\ModulesDataInterface;
-use FusionLab\Core\Api\PlatformMetaDataInterface;
+use FusionLab\Core\Api\Data\ModulesDataInterfaceFactory;
+use FusionLab\Core\Api\Data\ModulesDataInterface;
+use FusionLab\Core\Api\Data\PlatformMetaDataInterfaceFactory;
+use FusionLab\Core\Api\Data\PlatformMetaDataInterface;
 use Magento\Framework\App\Config\Storage\WriterInterface;
+use Magento\Framework\App\ProductMetadataInterface;
+use Magento\Framework\App\ResourceConnection;
 use Magento\Framework\DB\Adapter\AdapterInterface;
 use Magento\Framework\Encryption\Encryptor;
 use Magento\Framework\Exception\LocalizedException;
-use Magento\Framework\Module\ModuleListInterface;
-use Magento\Framework\App\ProductMetadataInterface;
-use FusionLab\Core\Api\Data\ModulesDataFactory;
-use FusionLab\Core\Api\Data\PlatformMetaDataFactory;
-use Magento\Framework\App\ResourceConnection;
+use Magento\Framework\Exception\NoSuchEntityException;
 use Magento\Framework\Module\Manager;
-use Ramsey\Uuid\Uuid;
+use Magento\Framework\Module\ModuleListInterface;
 use Magento\Framework\Webapi\Rest\Request;
+use Magento\Store\Model\StoreManagerInterface;
 
 class ApplicationInfo implements ApplicationInfoInterface
 {
-    public const UID_PATH = 'fusionlab_settings/general/application_uid';
 
-    /** @var ModuleListInterface */
     private ModuleListInterface $_moduleList;
 
-    /** @var ProductMetadataInterface */
     private ProductMetadataInterface $_productMetaDataInterace;
 
-    /** @var ModulesDataFactory */
-    private ModulesDataFactory $_modulesDataFactory;
+    private ModulesDataInterfaceFactory $_modulesDataFactory;
 
-    /** @var PlatformMetaDataFactory */
-    private PlatformMetaDataFactory $_platformMetaDataFactory;
+    private PlatformMetaDataInterfaceFactory $_platformMetaDataFactory;
 
-    /** @var AdapterInterface */
     private AdapterInterface $_resourceConnection;
 
-    /** @var Manager */
     private Manager $_moduleManager;
 
-    /** @var WriterInterface */
     private WriterInterface $_configWriter;
 
-    /** @var Encryptor */
     private Encryptor $_encryptor;
 
-    /** @var Request */
     private Request $_request;
+
+    private StoreManagerInterface $storeManager;
 
     /**
      * @param ModuleListInterface $moduleList
      * @param ProductMetadataInterface $productMetaDataInterface
-     * @param ModulesDataFactory $modulesDataFactory
-     * @param PlatformMetaDataFactory $platformMetaDataFactory
+     * @param ModulesDataInterfaceFactory $modulesDataFactory
+     * @param PlatformMetaDataInterfaceFactory $platformMetaDataFactory
      * @param ResourceConnection $resourceConnection
      * @param Manager $moduleManager
      * @param WriterInterface $configWriter
      * @param Encryptor $encryptor
      * @param Request $request
+     * @param StoreManagerInterface $storeManager
      */
     public function __construct(
-        ModuleListInterface      $moduleList,
-        ProductMetadataInterface $productMetaDataInterface,
-        ModulesDataFactory       $modulesDataFactory,
-        PlatformMetaDataFactory  $platformMetaDataFactory,
-        ResourceConnection       $resourceConnection,
-        Manager                  $moduleManager,
-        WriterInterface          $configWriter,
-        Encryptor                $encryptor,
-        Request                  $request
+        ModuleListInterface              $moduleList,
+        ProductMetadataInterface         $productMetaDataInterface,
+        ModulesDataInterfaceFactory      $modulesDataFactory,
+        PlatformMetaDataInterfaceFactory $platformMetaDataFactory,
+        ResourceConnection               $resourceConnection,
+        Manager                          $moduleManager,
+        WriterInterface                  $configWriter,
+        Encryptor                        $encryptor,
+        Request                          $request,
+        StoreManagerInterface         $storeManager
 
     )
     {
@@ -82,16 +77,8 @@ class ApplicationInfo implements ApplicationInfoInterface
         $this->_configWriter = $configWriter;
         $this->_encryptor = $encryptor;
         $this->_request = $request;
+        $this->storeManager = $storeManager;
     }
-
-    /**
-     * @return AdapterInterface
-     */
-    public function getConnection(): AdapterInterface
-    {
-        return $this->_resourceConnection;
-    }
-
 
     /**
      * @return PlatformMetaDataInterface
@@ -100,14 +87,9 @@ class ApplicationInfo implements ApplicationInfoInterface
     public function getApplicationInfo(): PlatformMetaDataInterface
     {
         $this->authenticateRequest();
-
         $newToken = $this->generateToken();
-
         $platformMetaData = $this->getPlatformMetaData($newToken);
-
-        //save the new token before reply
         $this->setToken($newToken);
-
         return $platformMetaData;
     }
 
@@ -120,13 +102,15 @@ class ApplicationInfo implements ApplicationInfoInterface
     {
         /** @var PlatformMetaDataInterface $platformMetaData */
         $platformMetaData = $this->_platformMetaDataFactory->create();
-        $platformMetaData->setPlatform($this->getPlatform());
+        $platformMetaData->setPlatform(self::PLATFORM);
         $platformMetaData->setPhpVersion(PHP_VERSION);
         $platformMetaData->setMysqlVersion($this->getMySQLVersion());
         $platformMetaData->setVersion($this->_productMetaDataInterace->getVersion());
         $platformMetaData->setModules($this->getFusionLabModules());
         $platformMetaData->setUrl($this->getApplicationUrl());
-        $platformMetaData->setRefreshedToken($newToken);
+        if($newToken){
+            $platformMetaData->setRefreshedToken($newToken);
+        }
         return $platformMetaData;
     }
 
@@ -137,17 +121,19 @@ class ApplicationInfo implements ApplicationInfoInterface
     private function authenticateRequest(): void
     {
         $externalToken = $this->_request->getHeader('x-fusionlab-secret');
-
-        $internalToken = $this->decryptToken($this->getCurrentAuthToken());
         if (!$externalToken) {
             throw new LocalizedException(__('Missing authentication token in the request headers.'));
         }
 
+        try {
+            $internalToken = $this->_encryptor->decrypt($this->getCurrentAuthToken());
+        } catch (\Exception $e) {
+            throw new LocalizedException(__('Invalid Token.'));
+        }
         if ($internalToken !== $externalToken) {
             throw new LocalizedException(__('Authentication failed: invalid token.'));
         }
     }
-
 
     /**
      * @return string
@@ -163,39 +149,15 @@ class ApplicationInfo implements ApplicationInfoInterface
     }
 
     /**
-     * @return string
+     * @return string|null
      */
-    public function getPlatform(): string
+    public function getApplicationUrl(): ?string
     {
-        return 'Magento2';
-    }
+        try {
+            return $this->storeManager->getStore()->getBaseUrl();
+        } catch (NoSuchEntityException $e) {
 
-    /**
-     * Get Website URL (Secure or fallback to Unsecure URL)
-     *
-     * @return string
-     */
-    public function getApplicationUrl(): string
-    {
-        $connection = $this->_resourceConnection;
-
-        // Try to get the secure URL first (HTTPS)
-        $select = $connection->select()
-            ->from('core_config_data', 'value')
-            ->where('path = ?', 'web/secure/base_url');
-
-        $secureUrl = $connection->fetchOne($select);
-
-        // If secure URL is not set, fallback to the unsecure URL (HTTP)
-        if (!$secureUrl) {
-            $select = $connection->select()
-                ->from('core_config_data', 'value')
-                ->where('path = ?', 'web/unsecure/base_url');
-
-            $secureUrl = $connection->fetchOne($select);
         }
-
-        return $secureUrl;
     }
 
     /**
@@ -222,10 +184,10 @@ class ApplicationInfo implements ApplicationInfoInterface
     }
 
     /**
-     * @param $moduleName
+     * @param string $moduleName
      * @return bool
      */
-    public function getModuleStatus($moduleName): bool
+    public function getModuleStatus(string $moduleName): bool
     {
         return $this->_moduleManager->isEnabled($moduleName);
     }
@@ -244,10 +206,7 @@ class ApplicationInfo implements ApplicationInfoInterface
      */
     private function isFusionLabModule(string $moduleName): bool
     {
-        if (!str_contains($moduleName, 'Fusion')) {
-            return false;
-        }
-        return true;
+        return str_contains($moduleName, 'FusionLab_');
     }
 
 
@@ -257,22 +216,7 @@ class ApplicationInfo implements ApplicationInfoInterface
      */
     public function setToken(string $token): void
     {
-        $uuid = $this->_encryptor->encrypt($token);
-        $this->_configWriter->save(self::UID_PATH, $uuid);
-    }
-
-    /**
-     * @param $token
-     * @return string
-     */
-    public function decryptToken($token): string
-    {
-        try {
-            return $this->_encryptor->decrypt($token);
-        } catch (\Exception $e) {
-
-        }
-        return '';
+        $this->_configWriter->save(self::UID_PATH, $this->_encryptor->encrypt($token));
     }
 
     /**
@@ -280,9 +224,7 @@ class ApplicationInfo implements ApplicationInfoInterface
      */
     public function generateToken(): string
     {
-        $uuid = Uuid::uuid4();
-        return $uuid->toString();
+        return uniqid();
     }
-
 
 }

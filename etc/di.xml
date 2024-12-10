@@ -2,17 +2,9 @@
 <config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
         xsi:noNamespaceSchemaLocation="urn:magento:framework:ObjectManager/etc/config.xsd">
 
-    <preference for="FusionLab\Core\Api\PlatformMetaDataInterface" type="FusionLab\Core\Model\PlatformMetaData"/>
-    <preference for="FusionLab\Core\Api\ModulesDataInterface" type="FusionLab\Core\Model\Modules"/>
+    <preference for="FusionLab\Core\Api\Data\ModulesDataInterface" type="FusionLab\Core\Model\Modules"/>
+    <preference for="FusionLab\Core\Api\Data\PlatformMetaDataInterface" type="FusionLab\Core\Model\PlatformMetaData"/>
     <preference for="FusionLab\Core\Api\ApplicationInfoInterface" type="FusionLab\Core\Model\ApplicationInfo"/>
-    <preference for="Ramsey\Uuid\Rfc4122\FieldsInterface" type="Ramsey\Uuid\Rfc4122\Fields" />
 
-    <type name="Magento\Framework\Console\CommandListInterface">
-        <arguments>
-            <argument name="commands" xsi:type="array">
-                <item name="fusionlab_register" xsi:type="object">FusionLab\Core\Console\Command\RegistrationCommand</item>
-            </argument>
-        </arguments>
-    </type>
 </config>
 

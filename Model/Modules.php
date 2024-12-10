@@ -2,88 +2,57 @@
 
 namespace FusionLab\Core\Model;
 
-use FusionLab\Core\Api\ModulesDataInterface;
+use FusionLab\Core\Api\Data\ModulesDataInterface;
+use Magento\Framework\DataObject;
 
-class Modules implements \FusionLab\Core\Api\ModulesDataInterface
+class Modules extends DataObject implements ModulesDataInterface
 {
-    /**
-     * @var string
-     */
-    private $name;
 
     /**
-     * @var string
-     */
-    private $version;
-
-    /**
-     * @var bool
-     */
-    private $status;
-
-    /**
-     * Get module name.
-     *
-     * @return string
+     * @inheritDoc
      */
     public function getName(): string
     {
-        return $this->name;
+        return $this->getData(self::NAME);
     }
 
     /**
-     * Set module name.
-     *
-     * @param string $name
-     * @return string
+     * @inheritDoc
      */
-    public function setName(string $name): string
+    public function setName(string $name): \FusionLab\Core\Api\Data\ModulesDataInterface
     {
-        $this->name = $name;
-        return $this->name;
+        return $this->setData(self::NAME, $name);
     }
 
     /**
-     * Get module version.
-     *
-     * @return string
+     * @inheritDoc
      */
     public function getVersion(): string
     {
-        return $this->version;
+        return $this->getData(self::VERSION);
     }
 
     /**
-     * Set module version.
-     *
-     * @param string $version
-     * @return string
+     * @inheritDoc
      */
-    public function setVersion(string $version): string
+    public function setVersion(string $version): \FusionLab\Core\Api\Data\ModulesDataInterface
     {
-        $this->version = $version;
-        return $this->version;
+        return $this->setData(self::VERSION, $version);
     }
 
     /**
-     * Get module status.
-     *
-     * @return bool
+     * @inheritDoc
      */
     public function getStatus(): bool
     {
-        return $this->status;
+        return $this->getData(self::STATUS);
     }
 
     /**
-     * Set module status.
-     *
-     * @param bool $status
-     * @return bool
+     * @inheritDoc
      */
-    public function setStatus(bool $status): bool
+    public function setStatus(bool $status): \FusionLab\Core\Api\Data\ModulesDataInterface
     {
-        $this->status = $status;
-        return $this->status;
+        return $this->setData(self::STATUS, $status);
     }
 }
