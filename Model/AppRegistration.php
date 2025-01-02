@@ -18,7 +18,6 @@ class AppRegistration implements RegistrationInterface
     private Client $_client;
     private DirectoryList $_directoryList;
     private ApplicationInfoInterface $_applicationInfo;
-
     private LoggerInterface $logger;
 
     /**
@@ -45,10 +44,6 @@ class AppRegistration implements RegistrationInterface
      */
     public function register(): void
     {
-        if ($this->isRegistered()) {
-            return;
-        }
-
         try {
             $response = $this->_client->post(self::REGISTRATION_ENDPOINT, [
                 'headers' => [
@@ -101,9 +96,21 @@ class AppRegistration implements RegistrationInterface
         $verificationFilePath = '';
         try {
             $basePath = $this->_directoryList->getPath('pub') . '/fusionlab';
+
+            // Check if the directory exists, if not, create it
             if (!is_dir($basePath)) {
                 mkdir($basePath, 0755, true);
             }
+
+            // Check if a file already exists in the directory
+            $existingFiles = glob($basePath . '/*.txt');
+            if (!empty($existingFiles)) {
+                // Return the first existing file's relative path
+                $existingFilePath = basename($existingFiles[0]);
+                return 'fusionlab/' . $existingFilePath;
+            }
+
+            // If no file exists, create a new one
             $fileName = uniqid() . '.txt';
             $absoluteFilePath = $basePath . DIRECTORY_SEPARATOR . $fileName;
             file_put_contents($absoluteFilePath, '');
@@ -111,15 +118,7 @@ class AppRegistration implements RegistrationInterface
         } catch (\Exception $e) {
             $this->logger->error($e->getMessage(), $e->getTrace());
         }
+
         return $verificationFilePath;
     }
-
-    /**
-     * @return bool
-     */
-    private function isRegistered(): bool
-    {
-        return !empty($this->_applicationInfo->getCurrentAuthToken());
-    }
-
 }
