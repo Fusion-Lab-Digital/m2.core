@@ -1,5 +1,20 @@
 <?php
-
+/**
+ * Copyright (c) 2025 Fusion Lab G.P
+ * Website: https://fusionlab.gr
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 namespace FusionLab\Core\Model;
 
 use GuzzleHttp\Exception\GuzzleException;
@@ -13,7 +28,7 @@ use Psr\Log\LoggerInterface;
 class AppRegistration implements RegistrationInterface
 {
 //    const REGISTRATION_ENDPOINT = 'https://warden.fusionlab.gr/api/register';
-    const REGISTRATION_ENDPOINT = 'http://warden.p83.localhost/api/register';
+    const REGISTRATION_ENDPOINT = 'http://warden.p82.localhost/api/register';
 
     private Client $_client;
     private DirectoryList $_directoryList;
@@ -30,7 +45,7 @@ class AppRegistration implements RegistrationInterface
         Client                   $client,
         DirectoryList            $directoryList,
         ApplicationInfoInterface $applicationInfo,
-        LoggerInterface           $logger
+        LoggerInterface          $logger
     )
     {
         $this->_client = $client;
