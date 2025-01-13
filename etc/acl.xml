@@ -22,7 +22,7 @@
     <acl>
         <resources>
             <resource id="Magento_Backend::admin">
-                <resource id="FusionLab_Core::config" title="FusionLab Config" sortOrder="100"/>
+                <resource id="FusionLab_Core::main_menu" title="FusionLab Core Menu" sortOrder="100"/>
             </resource>
         </resources>
     </acl>

@@ -21,9 +21,9 @@
         xsi:noNamespaceSchemaLocation="urn:magento:framework:Config/etc/menu.xsd">
     <menu>
         <add id="FusionLab_Core::main_menu"
-             title="Fusion Lab Extensions"
+             title="Fusion Lab"
              module="FusionLab_Core"
-             sortOrder="10000"
+             sortOrder="30"
              resource="FusionLab_Core::main_menu"/>
     </menu>
 </config>
