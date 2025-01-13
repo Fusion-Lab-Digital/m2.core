@@ -15,6 +15,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 namespace FusionLab\Core\Model;
 
 use FusionLab\Core\Api\Data\ModulesDataInterface;

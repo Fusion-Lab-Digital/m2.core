@@ -15,10 +15,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 namespace FusionLab\Core\Api;
 
 /**
  * Interface HttpPostInterface
+ *
  * @package FusionLab\Core\Api
  */
 interface RegistrationInterface
@@ -28,6 +30,4 @@ interface RegistrationInterface
      * @return void
      */
     public function register(): void;
-
-
 }

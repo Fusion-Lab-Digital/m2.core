@@ -15,7 +15,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 namespace FusionLab\Core\Api;
+
+use FusionLab\Core\Api\Data\PlatformMetaDataInterface;
 
 interface ApplicationInfoInterface
 {
@@ -24,7 +27,7 @@ interface ApplicationInfoInterface
     const UID_PATH = 'fusionlab_settings/general/application_uid';
 
     /**
-     * @return \FusionLab\Core\Api\Data\PlatformMetaDataInterface
+     * @return PlatformMetaDataInterface
      */
     public function getApplicationInfo(): Data\PlatformMetaDataInterface;
 }

@@ -15,6 +15,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 namespace FusionLab\Core\Api\Data;
 
 interface PlatformMetaDataInterface
@@ -104,5 +105,4 @@ interface PlatformMetaDataInterface
      * @return \FusionLab\Core\Api\Data\PlatformMetaDataInterface
      */
     public function setRefreshedToken(string $token): \FusionLab\Core\Api\Data\PlatformMetaDataInterface;
-
 }

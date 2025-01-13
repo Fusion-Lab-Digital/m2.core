@@ -1,5 +1,5 @@
 .admin__menu #menu-fusionlab-core-main-menu > a:before {
-    content:'';
+    content: '';
     font-style: normal !important;
     font-weight: normal !important;
     font-variant: normal !important;
@@ -14,15 +14,16 @@
     width: 70px;
     height: 35px;
     margin-bottom: 10px;
-    top:10px;
-    left:0;
+    top: 10px;
+    left: 0;
 }
 
 
-.fusionlab-tab strong{
+.fusionlab-tab strong {
     margin-left: 4.5rem;
 }
-.fusionlab-tab strong::before{
+
+.fusionlab-tab strong::before {
     content: "";
     display: inline-block;
     background-image: url('../fonts/fusion-lab-icon.svg');
@@ -31,6 +32,6 @@
     width: 70px;
     height: 30px;
     position: absolute;
-    top:10px;
-    left:0;
+    top: 10px;
+    left: 0;
 }

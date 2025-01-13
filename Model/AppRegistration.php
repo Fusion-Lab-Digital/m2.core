@@ -15,24 +15,29 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 namespace FusionLab\Core\Model;
 
-use GuzzleHttp\Exception\GuzzleException;
+use Exception;
+use FusionLab\Core\Api\ApplicationInfoInterface;
 use FusionLab\Core\Api\RegistrationInterface;
 use GuzzleHttp\Client;
+use GuzzleHttp\Exception\GuzzleException;
 use Magento\Framework\Filesystem\DirectoryList;
-use FusionLab\Core\Api\ApplicationInfoInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Log\LoggerInterface;
 
 class AppRegistration implements RegistrationInterface
 {
-//    const REGISTRATION_ENDPOINT = 'https://warden.fusionlab.gr/api/register';
+    // const REGISTRATION_ENDPOINT = 'https://warden.fusionlab.gr/api/register';
     const REGISTRATION_ENDPOINT = 'http://warden.p82.localhost/api/register';
 
     private Client $_client;
+
     private DirectoryList $_directoryList;
+
     private ApplicationInfoInterface $_applicationInfo;
+
     private LoggerInterface $logger;
 
     /**
@@ -46,8 +51,7 @@ class AppRegistration implements RegistrationInterface
         DirectoryList            $directoryList,
         ApplicationInfoInterface $applicationInfo,
         LoggerInterface          $logger
-    )
-    {
+    ) {
         $this->_client = $client;
         $this->_directoryList = $directoryList;
         $this->_applicationInfo = $applicationInfo;
@@ -60,24 +64,29 @@ class AppRegistration implements RegistrationInterface
     public function register(): void
     {
         try {
-            $response = $this->_client->post(self::REGISTRATION_ENDPOINT, [
-                'headers' => [
-                    'Content-Type' => 'application/json',
-                    'Accept' => 'application/json',
-                ],
-                'body' => json_encode([
-                    'platform' => ApplicationInfoInterface::PLATFORM,
-                    'url' => $this->_applicationInfo->getApplicationUrl(),
-                    'verification' => $this->makeSignature(),
-                ]),
-                'timeout' => 5.0,
-                'connect_timeout' => 5.0,
-            ]);
+            $response = $this->_client->post(
+                self::REGISTRATION_ENDPOINT,
+                [
+                    'body' => json_encode(
+                        [
+                            'platform' => ApplicationInfoInterface::PLATFORM,
+                            'url' => $this->_applicationInfo->getApplicationUrl(),
+                            'verification' => $this->makeSignature(),
+                        ]
+                    ),
+                    'connect_timeout' => 5.0,
+                    'headers' => [
+                        'Accept' => 'application/json',
+                        'Content-Type' => 'application/json',
+                    ],
+                    'timeout' => 5.0,
+                ]
+            );
 
             $this->processRegistrationResponse($response);
         } catch (GuzzleException $e) {
             $this->logger->error($e->getMessage(), $e->getTrace());
-        }
+        }//end try
     }
 
     /**
@@ -102,7 +111,6 @@ class AppRegistration implements RegistrationInterface
         return is_string($uid) && strlen($uid) === 36;
     }
 
-
     /**
      * @return string
      */
@@ -112,27 +120,27 @@ class AppRegistration implements RegistrationInterface
         try {
             $basePath = $this->_directoryList->getPath('pub') . '/fusionlab';
 
-            // Check if the directory exists, if not, create it
+            // Check if the directory exists, if not, create it.
             if (!is_dir($basePath)) {
                 mkdir($basePath, 0755, true);
             }
 
-            // Check if a file already exists in the directory
+            // Check if a file already exists in the directory.
             $existingFiles = glob($basePath . '/*.txt');
             if (!empty($existingFiles)) {
-                // Return the first existing file's relative path
+                // Return the first existing file's relative path.
                 $existingFilePath = basename($existingFiles[0]);
                 return 'fusionlab/' . $existingFilePath;
             }
 
-            // If no file exists, create a new one
+            // If no file exists, create a new one.
             $fileName = uniqid() . '.txt';
             $absoluteFilePath = $basePath . DIRECTORY_SEPARATOR . $fileName;
             file_put_contents($absoluteFilePath, '');
             $verificationFilePath = 'fusionlab/' . $fileName;
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             $this->logger->error($e->getMessage(), $e->getTrace());
-        }
+        }//end try
 
         return $verificationFilePath;
     }

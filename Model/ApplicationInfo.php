@@ -15,13 +15,15 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 namespace FusionLab\Core\Model;
 
+use Exception;
 use FusionLab\Core\Api\ApplicationInfoInterface;
-use FusionLab\Core\Api\Data\ModulesDataInterfaceFactory;
 use FusionLab\Core\Api\Data\ModulesDataInterface;
-use FusionLab\Core\Api\Data\PlatformMetaDataInterfaceFactory;
+use FusionLab\Core\Api\Data\ModulesDataInterfaceFactory;
 use FusionLab\Core\Api\Data\PlatformMetaDataInterface;
+use FusionLab\Core\Api\Data\PlatformMetaDataInterfaceFactory;
 use Magento\Framework\App\Config\Storage\WriterInterface;
 use Magento\Framework\App\ProductMetadataInterface;
 use Magento\Framework\App\ResourceConnection;
@@ -39,7 +41,7 @@ class ApplicationInfo implements ApplicationInfoInterface
 
     private ModuleListInterface $_moduleList;
 
-    private ProductMetadataInterface $_productMetaDataInterace;
+    private ProductMetadataInterface $_productMetaDataInterface;
 
     private ModulesDataInterfaceFactory $_modulesDataFactory;
 
@@ -79,12 +81,10 @@ class ApplicationInfo implements ApplicationInfoInterface
         WriterInterface                  $configWriter,
         Encryptor                        $encryptor,
         Request                          $request,
-        StoreManagerInterface         $storeManager
-
-    )
-    {
+        StoreManagerInterface            $storeManager
+    ) {
         $this->_moduleList = $moduleList;
-        $this->_productMetaDataInterace = $productMetaDataInterface;
+        $this->_productMetaDataInterface = $productMetaDataInterface;
         $this->_modulesDataFactory = $modulesDataFactory;
         $this->_platformMetaDataFactory = $platformMetaDataFactory;
         $this->_resourceConnection = $resourceConnection->getConnection();
@@ -108,27 +108,24 @@ class ApplicationInfo implements ApplicationInfoInterface
         return $platformMetaData;
     }
 
-
     /**
      * @param $newToken
      * @return PlatformMetaDataInterface
      */
     public function getPlatformMetaData($newToken = null): PlatformMetaDataInterface
     {
-        /** @var PlatformMetaDataInterface $platformMetaData */
         $platformMetaData = $this->_platformMetaDataFactory->create();
         $platformMetaData->setPlatform(self::PLATFORM);
         $platformMetaData->setPhpVersion(PHP_VERSION);
         $platformMetaData->setMysqlVersion($this->getMySQLVersion());
-        $platformMetaData->setVersion($this->_productMetaDataInterace->getVersion());
+        $platformMetaData->setVersion($this->_productMetaDataInterface->getVersion());
         $platformMetaData->setModules($this->getFusionLabModules());
         $platformMetaData->setUrl($this->getApplicationUrl());
-        if($newToken){
+        if ($newToken) {
             $platformMetaData->setRefreshedToken($newToken);
         }
         return $platformMetaData;
     }
-
 
     /**
      * @throws LocalizedException
@@ -142,7 +139,7 @@ class ApplicationInfo implements ApplicationInfoInterface
 
         try {
             $internalToken = $this->_encryptor->decrypt($this->getCurrentAuthToken());
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             throw new LocalizedException(__('Invalid Token.'));
         }
         if ($internalToken !== $externalToken) {
@@ -158,7 +155,7 @@ class ApplicationInfo implements ApplicationInfoInterface
         $connection = $this->_resourceConnection;
         $select = $connection->select()
             ->from($connection->getTableName('core_config_data'), ['value'])
-            ->where('path  = ?  ', ApplicationInfo::UID_PATH);
+            ->where('path  = ?  ', ApplicationInfoInterface::UID_PATH);
 
         return $connection->fetchOne($select);
     }
@@ -171,7 +168,7 @@ class ApplicationInfo implements ApplicationInfoInterface
         try {
             return $this->storeManager->getStore()->getBaseUrl();
         } catch (NoSuchEntityException $e) {
-
+            return null;
         }
     }
 
@@ -188,7 +185,6 @@ class ApplicationInfo implements ApplicationInfoInterface
                 continue;
             }
 
-            /** @var ModulesDataInterface $module */
             $module = $this->_modulesDataFactory->create();
             $module->setName($fusionLabModule['name']);
             $module->setVersion($fusionLabModule['setup_version'] ?? '');
@@ -224,7 +220,6 @@ class ApplicationInfo implements ApplicationInfoInterface
         return str_contains($moduleName, 'FusionLab_');
     }
 
-
     /**
      * @param string $token
      * @return void
@@ -241,5 +236,4 @@ class ApplicationInfo implements ApplicationInfoInterface
     {
         return uniqid();
     }
-
 }
