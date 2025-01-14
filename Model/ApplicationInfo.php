@@ -30,7 +30,6 @@ use Magento\Framework\App\ResourceConnection;
 use Magento\Framework\DB\Adapter\AdapterInterface;
 use Magento\Framework\Encryption\Encryptor;
 use Magento\Framework\Exception\LocalizedException;
-use Magento\Framework\Exception\NoSuchEntityException;
 use Magento\Framework\Module\Manager;
 use Magento\Framework\Module\ModuleListInterface;
 use Magento\Framework\Webapi\Rest\Request;
@@ -165,11 +164,11 @@ class ApplicationInfo implements ApplicationInfoInterface
      */
     public function getApplicationUrl(): ?string
     {
-        try {
-            return $this->storeManager->getStore()->getBaseUrl();
-        } catch (NoSuchEntityException $e) {
-            return null;
-        }
+        $select = $this->_resourceConnection->select()
+            ->from($this->_resourceConnection->getTableName('core_config_data'), ['value'])
+            ->where('path = ?', 'web/secure/base_url');
+
+        return $this->_resourceConnection->fetchOne($select) ?? null;
     }
 
     /**
