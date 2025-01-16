@@ -23,5 +23,15 @@
         <tab id="fusionlab" translate="label" sortOrder="10000">
             <label>FusionLab Extensions</label>
         </tab>
+        <section id="extensions_notifications" translate="label" type="text" sortOrder="0" showInDefault="1" showInWebsite="0" showInStore="0">
+            <class>separator-top</class>
+            <label><![CDATA[Extensions & Support]]></label>
+            <tab>fusionlab</tab>
+            <resource>Magento_Backend::admin</resource>
+            <group id="installed_extensions" translate="label" type="text" sortOrder="1" showInDefault="1" showInWebsite="0" showInStore="0">
+                <label>Installed Extensions</label>
+                <frontend_model>FusionLab\Core\Block\Adminhtml\InstalledExtensions</frontend_model>
+            </group>
+        </section>
     </system>
 </config>

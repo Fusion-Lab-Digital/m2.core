@@ -1,0 +1,40 @@
+<?php
+/**
+ * Copyright (c) 2025 Fusion Lab G.P
+ * Website: https://fusionlab.gr
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+/** @var \FusionLab\Core\Block\Adminhtml\InstalledExtensions $block */
+
+$modules = $block->getModules();
+?>
+
+<div id="fusionlab-extensions">
+    <div class="title-wrapper">
+        <h1><?php echo __('Installed Extesions') ?></h1>
+        <a class="button action primary" href="https://fusionlab.gr/?utm_source=magento2&utm_medium=extensions&utm_campaign=need_support" target="_blank">Need Support?</a>
+    </div>
+    <div class="module-grid">
+        <?php foreach ($modules as $module) : ?>
+            <div class="module-item">
+                <span class="module-name"><?php echo $module->getName() ?></span>
+                <span class="module-version"><?php echo $module->getVersion() ?></span>
+                <span
+                    class="module-status <?php echo $module->getStatus() ? 'active' : 'inactive' ?>"><?php echo $module->getStatus() ? __('Active') : __('Inactive') ?></span>
+            </div>
+        <?php endforeach; ?>
+    </div>
+</div>
+
+
