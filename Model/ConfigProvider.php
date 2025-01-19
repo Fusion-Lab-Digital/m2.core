@@ -15,32 +15,30 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+namespace FusionLab\Core\Model;
 
-namespace FusionLab\Core\Setup;
+use Magento\Framework\App\Config\ScopeConfigInterface;
 
-use FusionLab\Core\Model\AppRegistration;
-use Magento\Framework\Setup\InstallSchemaInterface;
-use Magento\Framework\Setup\ModuleContextInterface;
-use Magento\Framework\Setup\SchemaSetupInterface;
-
-class Recurring implements InstallSchemaInterface
+class ConfigProvider
 {
 
-    private AppRegistration $appRegistration;
+    const XML_PATH_TRACKING_OPTIONS_INSTALLATION_TRACKING = 'fusionlab_extensions_notifications/tracking_options/enable_installation_tracking';
+
+    private ScopeConfigInterface $scopeConfig;
 
     /**
-     * @param AppRegistration $registration
+     * @param ScopeConfigInterface $scopeConfig
      */
-    public function __construct(AppRegistration $registration)
+    public function __construct(ScopeConfigInterface $scopeConfig)
     {
-        $this->appRegistration = $registration;
+        $this->scopeConfig = $scopeConfig;
     }
 
     /**
-     * @inheritdoc
+     * @return bool
      */
-    public function install(SchemaSetupInterface $setup, ModuleContextInterface $context): void
+    public function isInstallationTrackingEnabled():bool
     {
-        $this->appRegistration->register();
+        return $this->scopeConfig->getValue(self::XML_PATH_TRACKING_OPTIONS_INSTALLATION_TRACKING);
     }
 }

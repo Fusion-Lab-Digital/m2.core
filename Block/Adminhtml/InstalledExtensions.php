@@ -19,7 +19,6 @@ namespace FusionLab\Core\Block\Adminhtml;
 
 use FusionLab\Core\Api\ApplicationInfoInterface;
 use FusionLab\Core\Api\Data\ModulesDataInterface;
-use FusionLab\Core\Api\Data\PlatformMetaDataInterface;
 use Magento\Backend\Block\Template\Context;
 use Magento\Config\Block\System\Config\Form\Field;
 use Magento\Framework\Data\Form\Element\AbstractElement;

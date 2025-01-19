@@ -33,7 +33,6 @@ use Magento\Framework\Exception\LocalizedException;
 use Magento\Framework\Module\Manager;
 use Magento\Framework\Module\ModuleListInterface;
 use Magento\Framework\Webapi\Rest\Request;
-use Magento\Store\Model\StoreManagerInterface;
 
 class ApplicationInfo implements ApplicationInfoInterface
 {
@@ -56,7 +55,7 @@ class ApplicationInfo implements ApplicationInfoInterface
 
     private Request $_request;
 
-    private StoreManagerInterface $storeManager;
+    private ConfigProvider $configProvider;
 
     /**
      * @param ModuleListInterface $moduleList
@@ -68,7 +67,6 @@ class ApplicationInfo implements ApplicationInfoInterface
      * @param WriterInterface $configWriter
      * @param Encryptor $encryptor
      * @param Request $request
-     * @param StoreManagerInterface $storeManager
      */
     public function __construct(
         ModuleListInterface              $moduleList,
@@ -80,7 +78,7 @@ class ApplicationInfo implements ApplicationInfoInterface
         WriterInterface                  $configWriter,
         Encryptor                        $encryptor,
         Request                          $request,
-        StoreManagerInterface            $storeManager
+        ConfigProvider                    $configProvider
     ) {
         $this->_moduleList = $moduleList;
         $this->_productMetaDataInterface = $productMetaDataInterface;
@@ -91,15 +89,17 @@ class ApplicationInfo implements ApplicationInfoInterface
         $this->_configWriter = $configWriter;
         $this->_encryptor = $encryptor;
         $this->_request = $request;
-        $this->storeManager = $storeManager;
+        $this->configProvider = $configProvider;
     }
 
     /**
-     * @return PlatformMetaDataInterface
-     * @throws LocalizedException
+     * @inheriDoc
      */
-    public function getApplicationInfo(): PlatformMetaDataInterface
+    public function getApplicationInfo(): ?PlatformMetaDataInterface
     {
+        if (!$this->configProvider->isInstallationTrackingEnabled()) {
+            return null;
+        }
         $this->authenticateRequest();
         $newToken = $this->generateToken();
         $platformMetaData = $this->getPlatformMetaData($newToken);

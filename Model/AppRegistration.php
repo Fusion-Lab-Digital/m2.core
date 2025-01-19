@@ -40,6 +40,8 @@ class AppRegistration implements RegistrationInterface
 
     private LoggerInterface $logger;
 
+    private ConfigProvider $configProvider;
+
     /**
      * @param Client $client
      * @param DirectoryList $directoryList
@@ -50,12 +52,14 @@ class AppRegistration implements RegistrationInterface
         Client                   $client,
         DirectoryList            $directoryList,
         ApplicationInfoInterface $applicationInfo,
-        LoggerInterface          $logger
+        LoggerInterface          $logger,
+        ConfigProvider           $configProvider
     ) {
         $this->_client = $client;
         $this->_directoryList = $directoryList;
         $this->_applicationInfo = $applicationInfo;
         $this->logger = $logger;
+        $this->configProvider = $configProvider;
     }
 
     /**
@@ -63,6 +67,9 @@ class AppRegistration implements RegistrationInterface
      */
     public function register(): void
     {
+        if (!$this->configProvider->isInstallationTrackingEnabled()) {
+            return;
+        }
         try {
             $response = $this->_client->post(
                 self::REGISTRATION_ENDPOINT,
@@ -96,7 +103,6 @@ class AppRegistration implements RegistrationInterface
     private function processRegistrationResponse(ResponseInterface $response): void
     {
         $uid = $response->getBody()->getContents();
-
         if ($this->isValidUid($uid)) {
             $this->_applicationInfo->setToken($uid);
         }
