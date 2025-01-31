@@ -59,4 +59,4 @@ This module is licensed under the Apache 2.0 License. See [LICENSE](LICENSE) for
 
 ## 📩 Support
 
-For any issues, feature requests, or inquiries, please open an issue on [GitHub Issues](https://github.com/Fusion-Lab-Digital/m2.core/issues), contact us at [info@fusionlab.gr](info@fusionlab.gr), or visit our website at [fusionlab.gr](https://fusionlab.gr) for more information.
+For any issues, feature requests, or inquiries, please open an issue on [GitHub Issues](https://github.com/Fusion-Lab-Digital/m2.core/issues), contact us at info@fusionlab.gr, or visit our website at [fusionlab.gr](https://fusionlab.gr) for more information.
