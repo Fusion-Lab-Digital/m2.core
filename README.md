@@ -1,31 +1,40 @@
-# Magento 2 Module: FusionLab Core
+<img align="center" width="250" height="100" src="https://fusionlab.gr/fusion-lab-logo-neg-cropped.svg"/>
 
-## Introduction
-**FusionLab Core**, acts as the cornerstone for Fusion Lab extensions, offering critical functionalities and tools that enable and support the seamless operation of other Fusion Lab modules.
 
-## Features
+# Fusion Lab - Fusion Lab Core Extension
+
+## 📌 Overview
+**FusionLab Core**, acts as the cornerstone for Fusion Lab extensions, it is required to support the seamless operation of other Fusion Lab modules.
+
+## ⚡ Features
 - Provides core functionalities for FusionLab modules.
 - Acts as a dependency for other FusionLab extensions.
-- Includes reusable utilities and tools for Magento 2.
 
-## Installation
-### Via Composer
-1. Run the following command to require the module:
-   ```bash
-   composer require fusionlab/core
-   ```
-2. Enable the module:
-   ```bash
-   php bin/magento module:enable FusionLab_Core
-   ```
-3. Run setup upgrade to register the module:
-   ```bash
-   php bin/magento setup:upgrade
-   ```
-4. Flush the cache:
-   ```bash
-   php bin/magento cache:flush
-   ```
+## 🛠️ Installation
+
+### Install via Composer 2.x
+We recommend to install this module via a compatible version of [Composer 2.x](https://getcomposer.org/download/) for your Magento 2 Installtion.
+
+See your [Magento 2 Requirements here](https://experienceleague.adobe.com/en/docs/commerce-operations/installation-guide/system-requirements). 
+```bash
+composer require fusionlab/core
+php bin/magento module:enable FusionLab_Core
+php bin/magento setup:upgrade
+php bin/magento s:d:c
+php bin/magento s:s:d {Your Themes}
+php bin/magento cache:flush
+```
+
+### Manual Installation (not recommended)
+1. Download the module and extract it into `app/code/FusionLab/Core`
+2. Run the following Magento CLI commands:
+```bash
+php bin/magento module:enable FusionLab_Core
+php bin/magento setup:upgrade
+php bin/magento s:d:c
+php bin/magento s:s:d {Your Themes}
+php bin/magento cache:flush
+```
 
 ## Configuration
 This module does not require configuration directly. It works as a dependency for other Fusion Lab modules.
@@ -44,12 +53,10 @@ To disable tracking:
 
 No personal data is collected, and this data is used solely for improving the software.
 
-## License
-See the [LICENSE](./LICENSE) file for more information.
+## 📄 License
 
-## Support
-For questions, issues, or feature requests, please visit our website or GitHub repository:
-- **Website**: [https://fusionlab.gr](https://fusionlab.gr)
-- **GitHub**: [https://github.com/fusionlab/core](https://github.com/fusionlab/core)
+This module is licensed under the Apache 2.0 License. See [LICENSE](LICENSE) for details.
 
-Thank you for using **FusionLab Extensions**!
+## 📩 Support
+
+For any issues, feature requests, or inquiries, please open an issue on [GitHub Issues](https://github.com/Fusion-Lab-Digital/m2.core/issues), contact us at info@fusionlab.gr, or visit our website at [fusionlab.gr](https://fusionlab.gr) for more information.
