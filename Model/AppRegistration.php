@@ -29,8 +29,7 @@ use Psr\Log\LoggerInterface;
 
 class AppRegistration implements RegistrationInterface
 {
-    // const REGISTRATION_ENDPOINT = 'https://warden.fusionlab.gr/api/register';
-    const REGISTRATION_ENDPOINT = 'http://warden.p83.localhost/api/register';
+     const REGISTRATION_ENDPOINT = 'https://warden.fusionlab.gr/api/register';
 
     private Client $_client;
 
