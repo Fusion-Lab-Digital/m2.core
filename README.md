@@ -1,5 +1,6 @@
+<a href="https://fusionlab.gr?utm_source=github&utm_medium=core&utm_campaign=module" target="_blank">
 <img align="center" width="250" height="100" src="https://fusionlab.gr/fusion-lab-logo-neg-cropped.svg"/>
-
+</a>
 
 # Fusion Lab - Fusion Lab Core Extension
 
@@ -59,4 +60,4 @@ This module is licensed under the Apache 2.0 License. See [LICENSE](LICENSE) for
 
 ## 📩 Support
 
-For any issues, feature requests, or inquiries, please open an issue on [GitHub Issues](https://github.com/Fusion-Lab-Digital/m2.core/issues), contact us at info@fusionlab.gr, or visit our website at [fusionlab.gr](https://fusionlab.gr) for more information.
+For any issues, feature requests, or inquiries, please open an issue on [GitHub Issues](https://github.com/Fusion-Lab-Digital/m2.core/issues), contact us at info@fusionlab.gr, or visit our website at [fusionlab.gr](https://fusionlab.gr?utm_source=github&utm_medium=core&utm_campaign=module) for more information.
